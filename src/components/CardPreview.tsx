@@ -198,17 +198,17 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
             </tr>
           </thead>
 
-          <tbody className="bg-white">
+          <tbody className="">
             {filteredRows.map((row, idx) => {
               return (
                 <tr
                   key={idx}
-                  className="grid grid-cols-10 border-b border-grey-02 last:border-b-0 text-center"
+                  className={`bg-white grid grid-cols-10 border-b border-grey-02 last:border-b-0 text-center ${idx === filteredRows.length - 1 ? "rounded-b-xl" : ""}`}
                 >
                   {displayHeaders.map((item, itemIdx) => (
                     <td
                       key={item}
-                      className={`p-[6px] text-black-01 text-[13px] ${itemIdx === 0 ? "col-span-2" : "col-span-4"}`}
+                      className={`flex items-center justify-center p-[6px] text-black-01 text-[13px] ${itemIdx === 0 ? "col-span-2" : "col-span-4"}`}
                     >
                       {row[item] || <span className="text-black-01">-</span>}
                     </td>
