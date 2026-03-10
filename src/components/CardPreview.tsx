@@ -2,6 +2,7 @@ import { forwardRef, useMemo } from "react";
 import type { ExcelRow } from "../types";
 import QrIcon from "../assets/QrIcon.svg?react";
 import LoadImg from "../assets/LoadImg.svg?react";
+import QrIconLarge from "../assets/QrIconLarge.svg?react";
 
 interface Props {
   groupRows: ExcelRow[];
@@ -67,81 +68,129 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
       );
     }, [groupRows]);
 
+    const qrRow = groupRows.find((row) => row["소유사"] === "qr");
+    const qrColIndex = qrRow ? parseInt(qrRow["열"] || "0") : -1;
+
+    const maxColumn = groupRows.reduce((max, row) => {
+      return Math.max(max, parseInt(row["열"] || "0"));
+    }, 0);
+
+    const maxCol = qrColIndex === 0 ? maxColumn + 1 : maxColumn + 1;
+
     return (
-      <div
-        ref={ref}
-        style={{
-          width: 500,
-        }}
-        className="rounded-2xl shadow-lg overflow-hidden font-medium"
-      >
+      <div ref={ref} className="rounded-xl overflow-hidden font-medium px-4">
         {/* 도로 번호 섹션 */}
+        <div className="flex items-center gap-3 font-extrabold text-[18px] py-6">
+          <QrIconLarge className="w-6 h-6" />
 
-        <LoadImg className="w-full h-fit" />
-        <div className="bg-accent p-2">
+          <div className="flex items-center gap-2">
+            {groupRows[0]["제목"]?.split(`-`).map((item, index) => (
+              <div key={item} className="flex items-center gap-2">
+                <span> {item.trim()} </span>
+                {index !== item.length - 1 ? <span>-</span> : null}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
           {rowGroups.map((group, groupIdx) => {
-            // group의 첫 번째 행에 "제목" 값이 있으면 건너뛰기
-            const hasTitle = group[0]?.["제목"]?.trim() !== "";
-            if (hasTitle) return null;
-
-            const maxCol = parseInt(
-              groupRows[groupRows.length - 1]["열"] || "1",
-            );
+            if (groupIdx === 0) return null;
+            // const maxCol = parseInt(
+            //   groupRows[groupRows.length - 1]["열"] || "1",
+            // );
 
             return (
               <div
                 key={groupIdx}
+                className="rounded-xl"
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: `repeat(${maxCol + 1}, minmax(0, 1fr))`,
+                  boxShadow: `1.188px 2.966px 9.489px 0 rgba(0, 0, 0, 0.25)`,
                 }}
-                className="bg-accent/80 rounded-lg py-2"
               >
-                {/* QR 아이콘 */}
-                <div className="w-8 h-8 flex items-center justify-center">
-                  <QrIcon className="w-6 h-6 text-white" />
+                {groupIdx === 1 ? (
+                  <LoadImg className="w-full h-fit rounded-t-xl" />
+                ) : null}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: `repeat(${qrColIndex === 0 ? maxCol : maxCol - 1}, minmax(0, 1fr))`,
+                    borderRadius: `${groupIdx === 1 ? `0px 0px 12px 12px` : `12px`}`,
+                  }}
+                  className="bg-accent py-2 px-1 h-fit"
+                >
+                  {/* 모든 칸을 순회하며 QR 또는 번호 배치 */}
+                  {Array.from({ length: maxCol }, (_, colIndex) => {
+                    if (qrColIndex !== 0 && colIndex === 0) {
+                      return null;
+                    }
+                    if (colIndex === qrColIndex) {
+                      return (
+                        <div
+                          key={colIndex}
+                          className="flex items-center justify-center"
+                        >
+                          <QrIcon className="w-4 h-4 text-white" />
+                        </div>
+                      );
+                    }
+
+                    // QR이 아니면 위치번호 찾기
+                    const matchedRow = group.find(
+                      (row) =>
+                        parseInt(row["열"]) === colIndex &&
+                        row["소유사"] !== "qr",
+                    );
+
+                    const locationNum = matchedRow?.["위치번호"] || "";
+                    const hasData = locationNum && locationNum !== "0";
+                    const isHighlight = matchedRow?.["색칠"] === "1" || false;
+
+                    return (
+                      <div
+                        key={colIndex}
+                        className={`flex items-center justify-center `}
+                      >
+                        <div
+                          className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-medium ${
+                            hasData
+                              ? isHighlight
+                                ? "bg-yellow-01 text-black-01"
+                                : "bg-grey-01 text-white"
+                              : "bg-transparent"
+                          }`}
+                        >
+                          {hasData ? locationNum : ""}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-
-                {/* 번호들 - maxCol만큼 칸 생성 */}
-                {Array.from({ length: maxCol }, (_, colIndex) => {
-                  // 현재 colIndex와 일치하는 "열" 값을 가진 row 찾기
-                  const matchedRow = group.find(
-                    (row) => parseInt(row["열"]) === colIndex + 1,
-                  );
-
-                  const locationNum = matchedRow?.["위치번호"] || "";
-                  const hasData = locationNum && locationNum !== "0";
-                  // "색칠" 헤더 값이 있으면 하이라이트
-                  const isHighlight = matchedRow?.["색칠"]?.trim() !== "";
-
-                  return (
-                    <div
-                      key={colIndex}
-                      className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium ${
-                        hasData
-                          ? isHighlight
-                            ? "bg-yellow-01 text-black-01"
-                            : "bg-grey-01 text-white"
-                          : "bg-transparent"
-                      }`}
-                    >
-                      {hasData ? locationNum : ""}
-                    </div>
-                  );
-                })}
               </div>
             );
           })}
         </div>
 
         {/* Table */}
-        <table className="w-full text-sm border-collapse">
+        <div className="flex items-center gap-3 font-extrabold text-[18px] py-6">
+          <QrIconLarge className="w-6 h-6" />
+          <div className="flex items-center gap-2">
+            {groupRows[0]["제목"]?.split(`-`).map((item, index) => (
+              <div key={item} className="flex items-center gap-2">
+                <span> {item.trim()} </span>
+                {index !== item.length - 1 ? <span>-</span> : null}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-accent grid grid-cols-10">
+            <tr className="bg-accent grid grid-cols-10 rounded-t-xl">
               {displayHeaders.map((header, headerIdx) => (
                 <th
                   key={header}
-                  className={`p-3 text-white text-xs text-center font-medium ${headerIdx === 0 ? "col-span-2" : "col-span-4"}`}
+                  className={`px-[6px] py-[4px] text-white text-[13px] text-center font-medium ${headerIdx === 0 ? "col-span-2" : "col-span-4"}`}
                 >
                   {header}
                 </th>
@@ -159,7 +208,7 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
                   {displayHeaders.map((item, itemIdx) => (
                     <td
                       key={item}
-                      className={`py-2.5 px-3 text-black-01 text-xs ${itemIdx === 0 ? "col-span-2" : "col-span-4"}`}
+                      className={`p-[6px] text-black-01 text-[13px] ${itemIdx === 0 ? "col-span-2" : "col-span-4"}`}
                     >
                       {row[item] || <span className="text-black-01">-</span>}
                     </td>
