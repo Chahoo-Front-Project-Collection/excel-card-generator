@@ -190,7 +190,7 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
               {displayHeaders.map((header, headerIdx) => (
                 <th
                   key={header}
-                  className={`px-[6px] py-[4px] text-white text-[13px] text-center font-medium ${headerIdx === 0 ? "col-span-2" : "col-span-4"}`}
+                  className={`p-[6px] text-white text-[13px] text-center font-medium ${headerIdx === 0 ? "col-span-2" : "col-span-4"}`}
                 >
                   {header}
                 </th>

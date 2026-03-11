@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import type { ExcelRow } from "../types";
 import { CardPreview } from "./CardPreview";
+import { CardInfo } from "./CardInfo";
 import { downloadSingleCard } from "../utils/captureCard";
 
 interface Props {
@@ -111,13 +112,14 @@ export function CardList({
           const globalIndex = pageOffset + i;
 
           return (
-            <div key={globalIndex} className="flex flex-col gap-6 w-[360px]">
+            <div key={globalIndex} className="flex flex-col w-[360px]">
               <div
                 ref={(el) => {
                   cardRefs.current[globalIndex] = el;
                 }}
                 className="bg-[#D9E4F4] flex flex-col pb-4"
               >
+                <CardInfo title={cardRows[0]["제목"] || "No Title"} />
                 <CardPreview
                   groupRows={cardRows}
                   headers={headers}
@@ -125,7 +127,7 @@ export function CardList({
                 />
               </div>
 
-              <div className="flex justify-between gap-2">
+              <div className="flex justify-between gap-2 mt-6">
                 <button
                   onClick={() => handleDownloadOne(cardRows, i)}
                   disabled={downloading === i}
