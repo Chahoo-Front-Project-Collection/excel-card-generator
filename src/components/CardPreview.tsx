@@ -13,12 +13,23 @@ interface Props {
 export const CardPreview = forwardRef<HTMLDivElement, Props>(
   ({ groupRows, headers }, ref) => {
     const displayHeaders = headers.filter(
-      (h) => h !== "열" && h !== "행" && h !== "제목" && h !== "색칠",
+      (h) =>
+        h !== "열" &&
+        h !== "행" &&
+        h !== "제목" &&
+        h !== "색칠" &&
+        h !== "지상지하",
     );
 
     // "행" 값이 변경되는 시점을 기준으로 그룹 나누기
+    // "지상지하" === "지하"인 행만 포함
     const rowGroups = useMemo(() => {
-      const result = groupRows.reduce<{
+      // 먼저 "지하"인 행만 필터링
+      const undergroundRows = groupRows.filter(
+        (row) => row["지상지하"] === "지하",
+      );
+
+      const result = undergroundRows.reduce<{
         groups: ExcelRow[][];
         currentGroup: ExcelRow[];
         currentRowValue: string;
@@ -61,12 +72,28 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
         : result.groups;
     }, [groupRows]);
 
-    // 모든 데이터를 필터링 (테이블용)
-    const filteredRows = useMemo(() => {
+    // 지하 데이터를 필터링 (테이블용)
+    const filteredUnderRows = useMemo(() => {
       return groupRows.filter(
-        (row) => row["위치번호"]?.trim() !== "" && row["위치번호"] !== "0",
+        (row) =>
+          row["위치번호"]?.trim() !== "" &&
+          row["위치번호"] !== "0" &&
+          row["지상지하"] === "지하",
       );
     }, [groupRows]);
+
+    // 지상 데이터를 필터링 (테이블용)
+    const filteredGroundRows = useMemo(() => {
+      return groupRows.filter(
+        (row) =>
+          row["위치번호"]?.trim() !== "" &&
+          row["위치번호"] !== "0" &&
+          row["지상지하"] === "지상",
+      );
+    }, [groupRows]);
+
+    console.log("지하", filteredUnderRows);
+    // console.log("지상", filteredGroundRows);
 
     const qrRow = groupRows.find((row) => row["소유사"] === "qr");
     const qrColIndex = qrRow ? parseInt(qrRow["열"] || "0") : -1;
@@ -79,10 +106,11 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
 
     return (
       <div ref={ref} className="rounded-xl overflow-hidden font-medium px-4">
-        {/* 도로 번호 섹션 */}
+        {/* 도로 번호 섹션 [지하만 표시] */}
         <div className="flex items-center gap-3 font-extrabold text-[18px] py-6">
           <QrIconLarge className="w-6 h-6" />
 
+          {/* 제목 */}
           <div className="flex items-center gap-2">
             {groupRows[0]["제목"]?.split(`-`).map((item, index) => (
               <div key={item} className="flex items-center gap-2">
@@ -90,15 +118,13 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
                 {index !== item.length - 1 ? <span>-</span> : null}
               </div>
             ))}
+            - {groupRows[0]["지상지하"]}
           </div>
         </div>
 
         <div className="flex flex-col gap-3">
           {rowGroups.map((group, groupIdx) => {
             if (groupIdx === 0) return null;
-            // const maxCol = parseInt(
-            //   groupRows[groupRows.length - 1]["열"] || "1",
-            // );
 
             return (
               <div
@@ -171,9 +197,11 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
           })}
         </div>
 
-        {/* Table */}
+        {/* ------------------------ 지하 테이블 섹션 ------------------------ */}
         <div className="flex items-center gap-3 font-extrabold text-[18px] py-6">
           <QrIconLarge className="w-6 h-6" />
+
+          {/* 제목 */}
           <div className="flex items-center gap-2">
             {groupRows[0]["제목"]?.split(`-`).map((item, index) => (
               <div key={item} className="flex items-center gap-2">
@@ -181,6 +209,7 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
                 {index !== item.length - 1 ? <span>-</span> : null}
               </div>
             ))}
+            - {groupRows[0]["지상지하"]}
           </div>
         </div>
 
@@ -199,11 +228,11 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
           </thead>
 
           <tbody className="">
-            {filteredRows.map((row, idx) => {
+            {filteredUnderRows.map((row, idx) => {
               return (
                 <tr
                   key={idx}
-                  className={`bg-white grid grid-cols-10 border-b border-grey-02 last:border-b-0 text-center ${idx === filteredRows.length - 1 ? "rounded-b-xl" : ""}`}
+                  className={`bg-${row?.["색칠"] === "1" ? "yellow-01" : "white"} grid grid-cols-10 border-b border-grey-02 last:border-b-0 text-center ${idx === filteredUnderRows.length - 1 ? "rounded-b-xl" : ""}`}
                 >
                   {displayHeaders.map((item, itemIdx) => (
                     <td
@@ -218,6 +247,65 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
             })}
           </tbody>
         </table>
+
+        {/* ------------------------ 지상 테이블 섹션 ------------------------ */}
+
+        {filteredGroundRows.length > 0 ? (
+          <div>
+            <div className="flex items-center gap-3 font-extrabold text-[18px] py-6">
+              <QrIconLarge className="w-6 h-6" />
+
+              {/* 제목 */}
+              <div className="flex items-center gap-2">
+                {filteredGroundRows[0]["제목"]
+                  ?.split(`-`)
+                  .map((item, index) => (
+                    <div key={item} className="flex items-center gap-2">
+                      <span> {item.trim()} </span>
+                      {index !== item.length - 1 ? <span>-</span> : null}
+                    </div>
+                  ))}
+                - {filteredGroundRows[0]["지상지하"]}
+              </div>
+            </div>
+
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-accent grid grid-cols-10 rounded-t-xl">
+                  {displayHeaders.map((header, headerIdx) => (
+                    <th
+                      key={header}
+                      className={`p-[6px] text-white text-[13px] text-center font-medium ${headerIdx === 0 ? "col-span-2" : "col-span-4"}`}
+                    >
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="">
+                {filteredGroundRows.map((row, idx) => {
+                  return (
+                    <tr
+                      key={idx}
+                      className={`bg-${row?.["색칠"] === "1" ? "yellow-01" : "white"} grid grid-cols-10 border-b border-grey-02 last:border-b-0 text-center ${idx === filteredGroundRows.length - 1 ? "rounded-b-xl" : ""}`}
+                    >
+                      {displayHeaders.map((item, itemIdx) => (
+                        <td
+                          key={item}
+                          className={`flex items-center justify-center p-[6px] text-black-01 text-[13px] ${itemIdx === 0 ? "col-span-2" : "col-span-4"}`}
+                        >
+                          {row[item] || (
+                            <span className="text-black-01">-</span>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
     );
   },
