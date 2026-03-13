@@ -18,7 +18,8 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
         h !== "행" &&
         h !== "제목" &&
         h !== "색칠" &&
-        h !== "지상지하",
+        h !== "지상지하" &&
+        h !== "단",
     );
 
     // "행" 값이 변경되는 시점을 기준으로 그룹 나누기
@@ -92,9 +93,6 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
       );
     }, [groupRows]);
 
-    console.log("지하", filteredUnderRows);
-    // console.log("지상", filteredGroundRows);
-
     const qrRow = groupRows.find((row) => row["소유사"] === "qr");
     const qrColIndex = qrRow ? parseInt(qrRow["열"] || "0") : -1;
 
@@ -102,7 +100,7 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
       return Math.max(max, parseInt(row["열"] || "0"));
     }, 0);
 
-    const maxCol = qrColIndex === 0 ? maxColumn + 1 : maxColumn + 1;
+    const maxCol = maxColumn + 1;
 
     return (
       <div ref={ref} className="rounded-xl overflow-hidden font-medium px-4">
@@ -126,6 +124,10 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
           {rowGroups.map((group, groupIdx) => {
             if (groupIdx === 0) return null;
 
+            const maxRow = group.reduce((max, row) => {
+              return Math.max(max, parseInt(row["단"] || "1"));
+            }, 0);
+
             return (
               <div
                 key={groupIdx}
@@ -141,19 +143,23 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
                   style={{
                     display: "grid",
                     gridTemplateColumns: `repeat(${qrColIndex === 0 ? maxCol : maxCol - 1}, minmax(0, 1fr))`,
+                    gridTemplateRows: `repeat(${maxRow - 1}, minmax(0, 1fr))`,
                     borderRadius: `${groupIdx === 1 ? `0px 0px 12px 12px` : `12px`}`,
                   }}
-                  className="bg-accent py-2 px-1 h-fit"
+                  className="bg-accent py-2 px-1 h-fit gap-y-[3px]"
                 >
                   {/* 모든 칸을 순회하며 QR 또는 번호 배치 */}
-                  {Array.from({ length: maxCol }, (_, colIndex) => {
+                  {Array.from({ length: maxCol * maxRow }, (_, index) => {
+                    const colIndex = index % maxCol;
+                    const rowIndex = Math.floor(index / maxCol);
+
                     if (qrColIndex !== 0 && colIndex === 0) {
                       return null;
                     }
                     if (colIndex === qrColIndex) {
                       return (
                         <div
-                          key={colIndex}
+                          key={index}
                           className="flex items-center justify-center"
                         >
                           <QrIcon className="w-4 h-4 text-white" />
@@ -162,11 +168,13 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
                     }
 
                     // QR이 아니면 위치번호 찾기
-                    const matchedRow = group.find(
-                      (row) =>
+                    const matchedRow = group.find((row) => {
+                      return (
                         parseInt(row["열"]) === colIndex &&
-                        row["소유사"] !== "qr",
-                    );
+                        parseInt(row["단"] || "1") === rowIndex + 1 &&
+                        row["소유사"] !== "qr"
+                      );
+                    });
 
                     const locationNum = matchedRow?.["위치번호"] || "";
                     const hasData = locationNum && locationNum !== "0";
@@ -174,7 +182,7 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
 
                     return (
                       <div
-                        key={colIndex}
+                        key={index}
                         className={`flex items-center justify-center `}
                       >
                         <div
