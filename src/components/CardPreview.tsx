@@ -19,7 +19,12 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(
         h !== "제목" &&
         h !== "색칠" &&
         h !== "지상지하" &&
-        h !== "단",
+        h !== "단" &&
+        h !== "동" &&
+        h !== "서" &&
+        h !== "남" &&
+        h !== "북" &&
+        h !== "방향",
     );
 
     // "행" 값이 변경되는 시점을 기준으로 그룹 나누기

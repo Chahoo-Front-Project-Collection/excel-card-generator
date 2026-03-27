@@ -119,7 +119,10 @@ export function CardList({
                 }}
                 className="bg-[#D9E4F4] flex flex-col pb-4"
               >
-                <CardInfo title={cardRows[0]["제목"] || "No Title"} />
+                <CardInfo
+                  title={cardRows[0]["제목"] || "No Title"}
+                  cardRows={cardRows}
+                />
                 <CardPreview
                   groupRows={cardRows}
                   headers={headers}
