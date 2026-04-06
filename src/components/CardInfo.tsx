@@ -69,68 +69,70 @@ export function CardInfo({ title, cardRows }: Props) {
           <CardInfoRightImg className="w-[288px] h-[146px]" />
         </div>
 
-        {/* Section 2: Right Side */}
-        <div className="bg-white rounded-xl p-5">
-          <div className="space-y-1 mb-3">
-            <h3 className="text-black-01 text-base">
-              사거리 지점별 방면 안내:
-            </h3>
-            <div className="text-black-01 text-base space-y-0.5">
-              <p>
-                현재 정보는
-                <span className="text-red-01"> 붉은 점선으로 표시된</span>
-              </p>
-              <span className="font-semibold">{directionLabel} </span>
-              방향 데이터입니다.
+        {/* Section 2: Right Side - 방향 값 있을때만 출력 */}
+        {direction && southLabel && westLabel ? (
+          <div className="bg-white rounded-xl p-5">
+            <div className="space-y-1 mb-3">
+              <h3 className="text-black-01 text-base">
+                사거리 지점별 방면 안내:
+              </h3>
+              <div className="text-black-01 text-base space-y-0.5">
+                <p>
+                  현재 정보는
+                  <span className="text-red-01"> 붉은 점선으로 표시된</span>
+                </p>
+                <span className="font-semibold">{directionLabel} </span>
+                방향 데이터입니다.
+              </div>
+            </div>
+
+            <div className="w-[288px] h-[153px] rounded-xl relative">
+              <CrossRoadsImg className="absolute top-0 left-0 w-[288px] h-[153px] rounded-xl" />
+
+              {direction === "세로" ? (
+                <div className="absolute top-[32%] right-[30%]">
+                  <CrossLine1 />
+                </div>
+              ) : (
+                <div className="absolute bottom-11 left-1/2 -translate-x-1/2">
+                  <CrossLine2 />
+                </div>
+              )}
+
+              {/* 북 - 상단 중앙 */}
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 flex flex-row items-center font-semibold text-white text-[14px]">
+                <CrossArrowIcon width={22} height={22} className="rotate-90" />
+                <div className="text-stroke-01" data-text={northLabel}>
+                  {northLabel}
+                </div>
+              </div>
+
+              {/* 동 - 우측 중앙 */}
+              <div className="absolute right-1 top-[42%] flex flex-row items-center font-semibold text-white text-[14px]">
+                <div className="text-stroke-01" data-text={eastLabel}>
+                  {eastLabel}
+                </div>
+                <CrossArrowIcon width={22} height={22} className="rotate-180" />
+              </div>
+
+              {/* 남 - 하단 중앙 */}
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-row items-center font-semibold text-white text-[14px]">
+                <CrossArrowIcon width={22} height={22} className="-rotate-90" />
+                <div className="text-stroke-01" data-text={southLabel}>
+                  {southLabel}
+                </div>
+              </div>
+
+              {/* 서 - 좌측 중앙 */}
+              <div className="absolute left-1 top-[42%] flex flex-row items-center font-semibold text-white text-[14px]">
+                <CrossArrowIcon width={22} height={22} className="" />
+                <div className="text-stroke-01" data-text={westLabel}>
+                  {westLabel}
+                </div>
+              </div>
             </div>
           </div>
-
-          <div className="w-[288px] h-[153px] rounded-xl relative">
-            <CrossRoadsImg className="absolute top-0 left-0 w-[288px] h-[153px] rounded-xl" />
-
-            {direction === "세로" ? (
-              <div className="absolute top-[32%] right-[30%]">
-                <CrossLine1 />
-              </div>
-            ) : (
-              <div className="absolute bottom-11 left-1/2 -translate-x-1/2">
-                <CrossLine2 />
-              </div>
-            )}
-
-            {/* 북 - 상단 중앙 */}
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 flex flex-row items-center font-semibold text-white text-[14px]">
-              <CrossArrowIcon width={22} height={22} className="rotate-90" />
-              <div className="text-stroke-01" data-text={northLabel}>
-                {northLabel}
-              </div>
-            </div>
-
-            {/* 동 - 우측 중앙 */}
-            <div className="absolute right-1 top-[42%] flex flex-row items-center font-semibold text-white text-[14px]">
-              <div className="text-stroke-01" data-text={eastLabel}>
-                {eastLabel}
-              </div>
-              <CrossArrowIcon width={22} height={22} className="rotate-180" />
-            </div>
-
-            {/* 남 - 하단 중앙 */}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-row items-center font-semibold text-white text-[14px]">
-              <CrossArrowIcon width={22} height={22} className="-rotate-90" />
-              <div className="text-stroke-01" data-text={southLabel}>
-                {southLabel}
-              </div>
-            </div>
-
-            {/* 서 - 좌측 중앙 */}
-            <div className="absolute left-1 top-[42%] flex flex-row items-center font-semibold text-white text-[14px]">
-              <CrossArrowIcon width={22} height={22} className="" />
-              <div className="text-stroke-01" data-text={westLabel}>
-                {westLabel}
-              </div>
-            </div>
-          </div>
-        </div>
+        ) : null}
 
         <div className="flex flex-col gap-3 bg-white rounded-xl p-5 text-center">
           <div className="flex justify-center">
