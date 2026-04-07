@@ -70,7 +70,7 @@ export function CardInfo({ title, cardRows }: Props) {
         </div>
 
         {/* Section 2: Right Side - 방향 값 있을때만 출력 */}
-        {direction && southLabel && westLabel ? (
+        {direction ? (
           <div className="bg-white rounded-xl p-5">
             <div className="space-y-1 mb-3">
               <h3 className="text-black-01 text-base">
