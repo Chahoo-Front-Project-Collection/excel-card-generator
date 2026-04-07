@@ -89,7 +89,7 @@ export function CardInfo({ title, cardRows }: Props) {
             <div className="w-[288px] h-[153px] rounded-xl relative">
               <CrossRoadsImg className="absolute top-0 left-0 w-[288px] h-[153px] rounded-xl" />
 
-              {direction === "세로" ? (
+              {direction && direction === "세로" ? (
                 <div className="absolute top-[32%] right-[30%]">
                   <CrossLine1 />
                 </div>
