@@ -8,12 +8,16 @@
   --color-grey-02: #c4c8d0;
   --color-black-01: #1d1d1d;
   --color-red-01: #ef4444;
+  --color-yellow-02: #fff600;
 }
 
 @layer utilities {
   .text-stroke-01 {
     position: relative;
     z-index: 0;
+    text-shadow:
+      -1px -1px 2px rgba(0, 0, 0, 0.45),
+      1px 1px 2px rgba(0, 0, 0, 0.45);
   }
   .text-stroke-01::before {
     position: absolute;

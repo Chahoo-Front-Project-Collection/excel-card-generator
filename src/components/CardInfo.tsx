@@ -100,32 +100,32 @@ export function CardInfo({ title, cardRows }: Props) {
               )}
 
               {/* 북 - 상단 중앙 */}
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 flex flex-row items-center font-semibold text-white text-[14px]">
-                <CrossArrowIcon width={22} height={22} className="rotate-90" />
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 flex flex-row items-center font-semibold text-yellow-02 text-[14px]">
+                <CrossArrowIcon width={22} height={22} className="" />
                 <div className="text-stroke-01" data-text={northLabel}>
                   {northLabel}
                 </div>
               </div>
 
               {/* 동 - 우측 중앙 */}
-              <div className="absolute right-1 top-[42%] flex flex-row items-center font-semibold text-white text-[14px]">
+              <div className="absolute right-1 top-[42%] flex flex-row items-center font-semibold text-yellow-02 text-[14px]">
                 <div className="text-stroke-01" data-text={eastLabel}>
                   {eastLabel}
                 </div>
-                <CrossArrowIcon width={22} height={22} className="rotate-180" />
+                <CrossArrowIcon width={22} height={22} className="rotate-90" />
               </div>
 
               {/* 남 - 하단 중앙 */}
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-row items-center font-semibold text-white text-[14px]">
-                <CrossArrowIcon width={22} height={22} className="-rotate-90" />
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-row items-center font-semibold text-yellow-02 text-[14px]">
+                <CrossArrowIcon width={22} height={22} className="rotate-180" />
                 <div className="text-stroke-01" data-text={southLabel}>
                   {southLabel}
                 </div>
               </div>
 
               {/* 서 - 좌측 중앙 */}
-              <div className="absolute left-1 top-[42%] flex flex-row items-center font-semibold text-white text-[14px]">
-                <CrossArrowIcon width={22} height={22} className="" />
+              <div className="absolute left-1 top-[42%] flex flex-row items-center font-semibold text-yellow-02 text-[14px]">
+                <CrossArrowIcon width={22} height={22} className="-rotate-90" />
                 <div className="text-stroke-01" data-text={westLabel}>
                   {westLabel}
                 </div>
